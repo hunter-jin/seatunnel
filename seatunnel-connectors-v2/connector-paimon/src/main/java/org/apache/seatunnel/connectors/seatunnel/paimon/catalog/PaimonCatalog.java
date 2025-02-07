@@ -17,8 +17,24 @@
 
 package org.apache.seatunnel.connectors.seatunnel.paimon.catalog;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.seatunnel.api.configuration.ReadonlyConfig;
+import org.apache.seatunnel.api.table.catalog.Catalog;
+import org.apache.seatunnel.api.table.catalog.CatalogTable;
+import org.apache.seatunnel.api.table.catalog.Column;
+import org.apache.seatunnel.api.table.catalog.TablePath;
+import org.apache.seatunnel.api.table.catalog.TableSchema;
+import org.apache.seatunnel.api.table.catalog.exception.CatalogException;
+import org.apache.seatunnel.api.table.catalog.exception.DatabaseAlreadyExistException;
+import org.apache.seatunnel.api.table.catalog.exception.DatabaseNotExistException;
+import org.apache.seatunnel.api.table.catalog.exception.TableAlreadyExistException;
+import org.apache.seatunnel.api.table.catalog.exception.TableNotExistException;
+import org.apache.seatunnel.api.table.converter.BasicTypeDefine;
+import org.apache.seatunnel.connectors.seatunnel.paimon.config.PaimonConfig;
+import org.apache.seatunnel.connectors.seatunnel.paimon.config.PaimonSinkConfig;
+import org.apache.seatunnel.connectors.seatunnel.paimon.exception.PaimonConnectorErrorCode;
+import org.apache.seatunnel.connectors.seatunnel.paimon.exception.PaimonConnectorException;
+import org.apache.seatunnel.connectors.seatunnel.paimon.utils.SchemaUtil;
+
 import org.apache.paimon.catalog.Database;
 import org.apache.paimon.catalog.Identifier;
 import org.apache.paimon.schema.Schema;
@@ -26,15 +42,9 @@ import org.apache.paimon.table.FileStoreTable;
 import org.apache.paimon.table.Table;
 import org.apache.paimon.types.DataField;
 import org.apache.paimon.types.DataType;
-import org.apache.seatunnel.api.configuration.ReadonlyConfig;
-import org.apache.seatunnel.api.table.catalog.*;
-import org.apache.seatunnel.api.table.catalog.exception.*;
-import org.apache.seatunnel.api.table.converter.BasicTypeDefine;
-import org.apache.seatunnel.connectors.seatunnel.paimon.config.PaimonConfig;
-import org.apache.seatunnel.connectors.seatunnel.paimon.config.PaimonSinkConfig;
-import org.apache.seatunnel.connectors.seatunnel.paimon.exception.PaimonConnectorErrorCode;
-import org.apache.seatunnel.connectors.seatunnel.paimon.exception.PaimonConnectorException;
-import org.apache.seatunnel.connectors.seatunnel.paimon.utils.SchemaUtil;
+
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Closeable;
 import java.io.IOException;
