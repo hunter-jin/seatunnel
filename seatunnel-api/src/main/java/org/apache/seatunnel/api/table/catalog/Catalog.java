@@ -90,7 +90,7 @@ public interface Catalog extends AutoCloseable {
      * @return true if the given database exists in the catalog false otherwise
      * @throws CatalogException in case of any runtime exception
      */
-    boolean databaseExists(String databaseName) throws CatalogException;
+    boolean databaseExists(String databaseName) throws CatalogException, DatabaseNotExistException;
 
     /**
      * Get the names of all databases in this catalog.

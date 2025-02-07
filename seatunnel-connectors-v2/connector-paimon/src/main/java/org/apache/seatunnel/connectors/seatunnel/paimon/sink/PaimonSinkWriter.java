@@ -102,10 +102,9 @@ public class PaimonSinkWriter
         this.jobContext = jobContext;
         this.tableSchema = ((FileStoreTable) table).schema();
         BucketMode bucketMode = ((FileStoreTable) table).bucketMode();
-        this.dynamicBucket =
-                BucketMode.DYNAMIC == bucketMode || BucketMode.GLOBAL_DYNAMIC == bucketMode;
+        this.dynamicBucket = BucketMode.HASH_DYNAMIC == bucketMode;
         int bucket = ((FileStoreTable) table).coreOptions().bucket();
-        if (bucket == -1 && BucketMode.UNAWARE == bucketMode) {
+        if (bucket == -1 && BucketMode.BUCKET_UNAWARE == bucketMode) {
             log.warn("Append only table currently do not support dynamic bucket");
         }
         if (dynamicBucket) {
