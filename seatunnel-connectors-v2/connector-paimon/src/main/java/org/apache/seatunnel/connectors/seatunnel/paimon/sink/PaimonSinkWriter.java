@@ -17,7 +17,6 @@
 
 package org.apache.seatunnel.connectors.seatunnel.paimon.sink;
 
-import org.apache.paimon.disk.IOManager;
 import org.apache.seatunnel.api.common.JobContext;
 import org.apache.seatunnel.api.sink.SinkWriter;
 import org.apache.seatunnel.api.sink.SupportMultiTableSinkWriter;
@@ -35,6 +34,7 @@ import org.apache.seatunnel.connectors.seatunnel.paimon.utils.JobContextUtil;
 import org.apache.seatunnel.connectors.seatunnel.paimon.utils.RowConverter;
 
 import org.apache.paimon.data.InternalRow;
+import org.apache.paimon.disk.IOManager;
 import org.apache.paimon.schema.TableSchema;
 import org.apache.paimon.table.BucketMode;
 import org.apache.paimon.table.FileStoreTable;
@@ -110,7 +110,8 @@ public class PaimonSinkWriter
         } catch (IOException e) {
             throw new PaimonConnectorException(
                     PaimonConnectorErrorCode.TABLE_WRITE_RECORD_FAILED,
-                    "CreateTempDirectory seatunnel-paimon failed ", e);
+                    "CreateTempDirectory seatunnel-paimon failed ",
+                    e);
         }
 
         this.tableWrite = tableWriteBuilder.newWrite().withIOManager(ioManager);
