@@ -17,6 +17,7 @@
 
 package org.apache.seatunnel.connectors.seatunnel.paimon.sink;
 
+import org.apache.paimon.disk.IOManager;
 import org.apache.seatunnel.api.common.JobContext;
 import org.apache.seatunnel.api.sink.SinkWriter;
 import org.apache.seatunnel.api.sink.SupportMultiTableSinkWriter;
@@ -50,6 +51,8 @@ import org.apache.paimon.table.sink.WriteBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -68,6 +71,8 @@ public class PaimonSinkWriter
     private final WriteBuilder tableWriteBuilder;
 
     private final TableWrite tableWrite;
+
+    private final IOManager ioManager;
 
     private List<CommitMessage> committables = new ArrayList<>();
 
@@ -96,7 +101,19 @@ public class PaimonSinkWriter
                 JobContextUtil.isBatchJob(jobContext)
                         ? this.table.newBatchWriteBuilder()
                         : this.table.newStreamWriteBuilder();
-        this.tableWrite = tableWriteBuilder.newWrite();
+
+        // 创建临时目录
+        try {
+            Path tempDir = Files.createTempDirectory("seatunnel-paimon");
+            this.ioManager = IOManager.create(tempDir.toAbsolutePath().toString());
+            log.info("Temporary Directory: {}", tempDir.toAbsolutePath());
+        } catch (IOException e) {
+            throw new PaimonConnectorException(
+                    PaimonConnectorErrorCode.TABLE_WRITE_RECORD_FAILED,
+                    "CreateTempDirectory seatunnel-paimon failed ", e);
+        }
+
+        this.tableWrite = tableWriteBuilder.newWrite().withIOManager(ioManager);
         this.seaTunnelRowType = seaTunnelRowType;
         this.context = context;
         this.jobContext = jobContext;
@@ -210,6 +227,14 @@ public class PaimonSinkWriter
                     tableWrite.close();
                 } catch (Exception e) {
                     log.error("Failed to close table writer in paimon sink writer.", e);
+                    throw new SeaTunnelException(e);
+                }
+            }
+            if (Objects.nonNull(ioManager)) {
+                try {
+                    ioManager.close();
+                } catch (Exception e) {
+                    log.error("Failed to close io manager in paimon sink writer.", e);
                     throw new SeaTunnelException(e);
                 }
             }
