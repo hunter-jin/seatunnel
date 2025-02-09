@@ -1,2 +1,1 @@
-mvn clean package -pl seatunnel-dist -am -Dmaven.test.skip=truemvn clean package -pl seatunnel-dist -am -Dmaven.test.skip=true
-
+mvn clean flatten:flatten package  package -pl seatunnel-dist -am -Dmaven.test.skip=true
