@@ -17,6 +17,7 @@
 
 package org.apache.seatunnel.connectors.seatunnel.paimon.config;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.seatunnel.api.configuration.Option;
 import org.apache.seatunnel.api.configuration.Options;
 import org.apache.seatunnel.api.configuration.ReadonlyConfig;
@@ -45,11 +46,10 @@ public class PaimonSinkConfig extends PaimonConfig {
                     .defaultValue(DataSaveMode.APPEND_DATA)
                     .withDescription("data_save_mode");
 
-    public static final Option<String> CUSTOM_SQL =
-            Options.key("custom_sql")
-                    .stringType()
-                    .noDefaultValue()
-                    .withDescription("when schema_save_mode selects CUSTOM_PROCESSING custom SQL");
+    public static final Option<Map<String, String>> WITH_OVERWRITE =
+            Options.key("overwrite")
+                    .mapType()
+                    .noDefaultValue();
 
     public static final Option<String> PRIMARY_KEYS =
             Options.key("paimon.table.primary-keys")
@@ -74,19 +74,19 @@ public class PaimonSinkConfig extends PaimonConfig {
 
     private SchemaSaveMode schemaSaveMode;
     private DataSaveMode dataSaveMode;
-    private String customSql;
     private List<String> primaryKeys;
     private List<String> partitionKeys;
     private Map<String, String> writeProps;
+    private Map<String, String> withOverwrite;
 
     public PaimonSinkConfig(ReadonlyConfig readonlyConfig) {
         super(readonlyConfig);
         this.schemaSaveMode = readonlyConfig.get(SCHEMA_SAVE_MODE);
         this.dataSaveMode = readonlyConfig.get(DATA_SAVE_MODE);
-        this.customSql = readonlyConfig.getOptional(CUSTOM_SQL).orElse(null);
         this.primaryKeys = stringToList(readonlyConfig.get(PRIMARY_KEYS), ",");
         this.partitionKeys = stringToList(readonlyConfig.get(PARTITION_KEYS), ",");
         this.writeProps = readonlyConfig.get(WRITE_PROPS);
+        this.withOverwrite = readonlyConfig.get(WITH_OVERWRITE);
         checkConfig();
     }
 

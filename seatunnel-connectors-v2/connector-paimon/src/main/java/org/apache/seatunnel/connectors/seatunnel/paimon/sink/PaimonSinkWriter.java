@@ -53,12 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -95,11 +90,13 @@ public class PaimonSinkWriter
             Table table,
             SeaTunnelRowType seaTunnelRowType,
             JobContext jobContext,
-            PaimonHadoopConfiguration paimonHadoopConfiguration) {
+            PaimonHadoopConfiguration paimonHadoopConfiguration,
+            Map<String, String> overWriteWhenBatch
+            ) {
         this.table = table;
         this.tableWriteBuilder =
                 JobContextUtil.isBatchJob(jobContext)
-                        ? this.table.newBatchWriteBuilder()
+                        ? overWriteWhenBatch != null ? this.table.newBatchWriteBuilder().withOverwrite(overWriteWhenBatch) : this.table.newBatchWriteBuilder()
                         : this.table.newStreamWriteBuilder();
 
         // 创建临时目录
@@ -141,8 +138,9 @@ public class PaimonSinkWriter
             SeaTunnelRowType seaTunnelRowType,
             List<PaimonSinkState> states,
             JobContext jobContext,
-            PaimonHadoopConfiguration paimonHadoopConfiguration) {
-        this(context, table, seaTunnelRowType, jobContext, paimonHadoopConfiguration);
+            PaimonHadoopConfiguration paimonHadoopConfiguration,
+            Map<String, String> overWriteWhenBatch) {
+        this(context, table, seaTunnelRowType, jobContext, paimonHadoopConfiguration, overWriteWhenBatch);
         if (Objects.isNull(states) || states.isEmpty()) {
             return;
         }
