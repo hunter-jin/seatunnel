@@ -45,6 +45,12 @@ public class PaimonSinkConfig extends PaimonConfig {
                     .defaultValue(DataSaveMode.APPEND_DATA)
                     .withDescription("data_save_mode");
 
+    public static final Option<String> CUSTOM_SQL =
+            Options.key("custom_sql")
+                    .stringType()
+                    .noDefaultValue()
+                    .withDescription("when schema_save_mode selects CUSTOM_PROCESSING custom SQL");
+
     public static final Option<String> PRIMARY_KEYS =
             Options.key("paimon.table.primary-keys")
                     .stringType()
@@ -68,6 +74,7 @@ public class PaimonSinkConfig extends PaimonConfig {
 
     private SchemaSaveMode schemaSaveMode;
     private DataSaveMode dataSaveMode;
+    private String customSql;
     private List<String> primaryKeys;
     private List<String> partitionKeys;
     private Map<String, String> writeProps;
@@ -76,6 +83,7 @@ public class PaimonSinkConfig extends PaimonConfig {
         super(readonlyConfig);
         this.schemaSaveMode = readonlyConfig.get(SCHEMA_SAVE_MODE);
         this.dataSaveMode = readonlyConfig.get(DATA_SAVE_MODE);
+        this.customSql = readonlyConfig.getOptional(CUSTOM_SQL).orElse(null);
         this.primaryKeys = stringToList(readonlyConfig.get(PRIMARY_KEYS), ",");
         this.partitionKeys = stringToList(readonlyConfig.get(PARTITION_KEYS), ",");
         this.writeProps = readonlyConfig.get(WRITE_PROPS);

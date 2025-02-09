@@ -151,7 +151,7 @@ public class PaimonSink
                         paimonSinkConfig.getDataSaveMode(),
                         catalog,
                         catalogTable,
-                        null));
+                        paimonSinkConfig.getCustomSql()));
     }
 
     @Override
