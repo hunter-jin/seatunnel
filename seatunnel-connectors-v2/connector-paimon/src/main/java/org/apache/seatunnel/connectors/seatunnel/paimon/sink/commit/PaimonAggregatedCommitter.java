@@ -64,8 +64,8 @@ public class PaimonAggregatedCommitter
         this.tableWriteBuilder =
                 JobContextUtil.isBatchJob(jobContext)
                         ? overWriteWhenBatch != null
-                        ? table.newBatchWriteBuilder().withOverwrite(overWriteWhenBatch)
-                        : table.newBatchWriteBuilder()
+                                ? table.newBatchWriteBuilder().withOverwrite(overWriteWhenBatch)
+                                : table.newBatchWriteBuilder()
                         : table.newStreamWriteBuilder();
         PaimonSecurityContext.shouldEnableKerberos(paimonHadoopConfiguration);
     }
