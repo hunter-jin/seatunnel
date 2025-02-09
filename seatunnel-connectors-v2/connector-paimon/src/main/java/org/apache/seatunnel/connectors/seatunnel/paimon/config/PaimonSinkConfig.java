@@ -17,7 +17,6 @@
 
 package org.apache.seatunnel.connectors.seatunnel.paimon.config;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.seatunnel.api.configuration.Option;
 import org.apache.seatunnel.api.configuration.Options;
 import org.apache.seatunnel.api.configuration.ReadonlyConfig;
@@ -47,9 +46,7 @@ public class PaimonSinkConfig extends PaimonConfig {
                     .withDescription("data_save_mode");
 
     public static final Option<Map<String, String>> WITH_OVERWRITE =
-            Options.key("overwrite")
-                    .mapType()
-                    .noDefaultValue();
+            Options.key("overwrite").mapType().noDefaultValue();
 
     public static final Option<String> PRIMARY_KEYS =
             Options.key("paimon.table.primary-keys")

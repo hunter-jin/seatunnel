@@ -94,7 +94,12 @@ public class PaimonSink
     @Override
     public PaimonSinkWriter createWriter(SinkWriter.Context context) throws IOException {
         return new PaimonSinkWriter(
-                context, table, seaTunnelRowType, jobContext, paimonHadoopConfiguration, paimonSinkConfig.getWithOverwrite());
+                context,
+                table,
+                seaTunnelRowType,
+                jobContext,
+                paimonHadoopConfiguration,
+                paimonSinkConfig.getWithOverwrite());
     }
 
     @Override
@@ -108,7 +113,13 @@ public class PaimonSink
     public SinkWriter<SeaTunnelRow, PaimonCommitInfo, PaimonSinkState> restoreWriter(
             SinkWriter.Context context, List<PaimonSinkState> states) throws IOException {
         return new PaimonSinkWriter(
-                context, table, seaTunnelRowType, states, jobContext, paimonHadoopConfiguration, this.paimonSinkConfig.getWithOverwrite());
+                context,
+                table,
+                seaTunnelRowType,
+                states,
+                jobContext,
+                paimonHadoopConfiguration,
+                this.paimonSinkConfig.getWithOverwrite());
     }
 
     @Override
