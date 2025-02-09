@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -57,11 +58,14 @@ public class PaimonAggregatedCommitter
     public PaimonAggregatedCommitter(
             Table table,
             JobContext jobContext,
-            PaimonHadoopConfiguration paimonHadoopConfiguration) {
+            PaimonHadoopConfiguration paimonHadoopConfiguration,
+            Map<String, String> overWriteWhenBatch) {
         this.jobContext = jobContext;
         this.tableWriteBuilder =
                 JobContextUtil.isBatchJob(jobContext)
-                        ? table.newBatchWriteBuilder()
+                        ? overWriteWhenBatch != null
+                        ? table.newBatchWriteBuilder().withOverwrite(overWriteWhenBatch)
+                        : table.newBatchWriteBuilder()
                         : table.newStreamWriteBuilder();
         PaimonSecurityContext.shouldEnableKerberos(paimonHadoopConfiguration);
     }

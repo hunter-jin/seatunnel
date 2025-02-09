@@ -106,7 +106,7 @@ public class PaimonSink
     public Optional<SinkAggregatedCommitter<PaimonCommitInfo, PaimonAggregatedCommitInfo>>
             createAggregatedCommitter() throws IOException {
         return Optional.of(
-                new PaimonAggregatedCommitter(table, jobContext, paimonHadoopConfiguration));
+                new PaimonAggregatedCommitter(table, jobContext, paimonHadoopConfiguration, paimonSinkConfig.getWithOverwrite()));
     }
 
     @Override
