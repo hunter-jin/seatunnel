@@ -71,6 +71,11 @@ public class PaimonSinkConfig extends PaimonConfig {
                     .withDescription(
                             "Properties passed through to paimon table initialization, such as 'file.format', 'bucket'(org.apache.paimon.CoreOptions)");
 
+    public static final Option<Map<String, String>> WITH_OVERWRITE =
+            Options.key("overwrite")
+                    .mapType()
+                    .noDefaultValue();
+
     private final SchemaSaveMode schemaSaveMode;
     private final DataSaveMode dataSaveMode;
     private final CoreOptions.ChangelogProducer changelogProducer;
@@ -78,6 +83,7 @@ public class PaimonSinkConfig extends PaimonConfig {
     private final List<String> primaryKeys;
     private final List<String> partitionKeys;
     private final Map<String, String> writeProps;
+    private Map<String, String> withOverwrite;
 
     public PaimonSinkConfig(ReadonlyConfig readonlyConfig) {
         super(readonlyConfig);
@@ -86,6 +92,7 @@ public class PaimonSinkConfig extends PaimonConfig {
         this.primaryKeys = stringToList(readonlyConfig.get(PRIMARY_KEYS), ",");
         this.partitionKeys = stringToList(readonlyConfig.get(PARTITION_KEYS), ",");
         this.writeProps = readonlyConfig.get(WRITE_PROPS);
+        this.withOverwrite = readonlyConfig.get(WITH_OVERWRITE);
         this.changelogProducer =
                 Stream.of(CoreOptions.ChangelogProducer.values())
                         .filter(

@@ -28,6 +28,7 @@ import org.apache.seatunnel.api.table.schema.event.SchemaChangeEvent;
 import org.apache.seatunnel.api.table.schema.handler.TableSchemaChangeEventDispatcher;
 import org.apache.seatunnel.api.table.type.SeaTunnelRow;
 import org.apache.seatunnel.api.table.type.SeaTunnelRowType;
+import org.apache.seatunnel.common.constants.JobMode;
 import org.apache.seatunnel.common.utils.SeaTunnelException;
 import org.apache.seatunnel.connectors.seatunnel.paimon.catalog.PaimonCatalog;
 import org.apache.seatunnel.connectors.seatunnel.paimon.config.PaimonHadoopConfiguration;
@@ -58,12 +59,7 @@ import org.apache.paimon.table.sink.WriteBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.paimon.disk.IOManagerImpl.splitPaths;
@@ -100,6 +96,8 @@ public class PaimonSinkWriter
 
     private final PaimonSinkConfig paimonSinkConfig;
 
+    private final Boolean isBatch;
+
     private final TableSchemaChangeEventDispatcher TABLE_SCHEMACHANGER =
             new TableSchemaChangeEventDispatcher();
 
@@ -111,6 +109,7 @@ public class PaimonSinkWriter
             JobContext jobContext,
             PaimonSinkConfig paimonSinkConfig,
             PaimonHadoopConfiguration paimonHadoopConfiguration) {
+        this.isBatch = JobMode.BATCH.equals(jobContext.getJobMode());
         this.sourceTableSchema = catalogTable.getTableSchema();
         this.seaTunnelRowType = this.sourceTableSchema.toPhysicalRowDataType();
         this.paimonTablePath = catalogTable.getTablePath();
@@ -129,9 +128,9 @@ public class PaimonSinkWriter
         this.newTableWrite();
         BucketMode bucketMode = this.paimonFileStoretable.bucketMode();
         this.dynamicBucket =
-                BucketMode.DYNAMIC == bucketMode || BucketMode.GLOBAL_DYNAMIC == bucketMode;
+                BucketMode.HASH_DYNAMIC == bucketMode;
         int bucket = ((FileStoreTable) paimonFileStoretable).coreOptions().bucket();
-        if (bucket == -1 && BucketMode.UNAWARE == bucketMode) {
+        if (bucket == -1 && BucketMode.BUCKET_UNAWARE == bucketMode) {
             log.warn("Append only table currently do not support dynamic bucket");
         }
         if (dynamicBucket) {
@@ -228,7 +227,9 @@ public class PaimonSinkWriter
     }
 
     private void newTableWrite() {
-        this.tableWriteBuilder = this.paimonFileStoretable.newStreamWriteBuilder();
+        this.tableWriteBuilder = isBatch
+                ? ( paimonSinkConfig.getWriteProps() != null ? this.paimonFileStoretable.newBatchWriteBuilder().withOverwrite(paimonSinkConfig.getWithOverwrite()) : this.paimonFileStoretable.newBatchWriteBuilder())
+                 : this.paimonFileStoretable.newStreamWriteBuilder();
         TableWrite oldTableWrite = this.tableWrite;
         this.tableWrite =
                 tableWriteBuilder

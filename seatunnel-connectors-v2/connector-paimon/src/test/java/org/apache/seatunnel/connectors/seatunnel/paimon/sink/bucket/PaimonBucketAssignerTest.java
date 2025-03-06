@@ -58,16 +58,16 @@ public class PaimonBucketAssignerTest {
         Catalog catalog = CatalogFactory.createCatalog(CatalogContext.create(options));
         catalog.createDatabase(DATABASE_NAME, true);
         Identifier identifier = Identifier.create(DATABASE_NAME, TABLE_NAME);
-        if (!catalog.tableExists(identifier)) {
-            Schema.Builder schemaBuilder = Schema.newBuilder();
-            schemaBuilder.column("id", DataTypes.INT(), "primary Key");
-            schemaBuilder.column("name", DataTypes.STRING(), "name");
-            schemaBuilder.primaryKey("id");
-            schemaBuilder.option("bucket", "-1");
-            schemaBuilder.option("dynamic-bucket.target-row-num", "20");
-            Schema schema = schemaBuilder.build();
-            catalog.createTable(identifier, schema, false);
-        }
+//        if (!catalog.tableExists(identifier)) {
+//            Schema.Builder schemaBuilder = Schema.newBuilder();
+//            schemaBuilder.column("id", DataTypes.INT(), "primary Key");
+//            schemaBuilder.column("name", DataTypes.STRING(), "name");
+//            schemaBuilder.primaryKey("id");
+//            schemaBuilder.option("bucket", "-1");
+//            schemaBuilder.option("dynamic-bucket.target-row-num", "20");
+//            Schema schema = schemaBuilder.build();
+//            catalog.createTable(identifier, schema, false);
+//        }
         table = catalog.getTable(identifier);
     }
 

@@ -17,6 +17,7 @@
 
 package org.apache.seatunnel.connectors.seatunnel.paimon.catalog;
 
+import org.apache.paimon.catalog.Database;
 import org.apache.seatunnel.api.common.SeaTunnelAPIErrorCode;
 import org.apache.seatunnel.api.configuration.ReadonlyConfig;
 import org.apache.seatunnel.api.table.catalog.Catalog;
@@ -103,7 +104,12 @@ public class PaimonCatalog implements Catalog, PaimonTable {
 
     @Override
     public boolean databaseExists(String databaseName) throws CatalogException {
-        return catalog.databaseExists(databaseName);
+        try {
+            Database database = catalog.getDatabase(databaseName);
+            return database != null;
+        } catch (org.apache.paimon.catalog.Catalog.DatabaseNotExistException e) {
+            return false;
+        }
     }
 
     @Override
@@ -123,7 +129,12 @@ public class PaimonCatalog implements Catalog, PaimonTable {
 
     @Override
     public boolean tableExists(TablePath tablePath) throws CatalogException {
-        return catalog.tableExists(toIdentifier(tablePath));
+        try {
+            Table table = catalog.getTable(toIdentifier(tablePath));
+            return table != null;
+        } catch (org.apache.paimon.catalog.Catalog.TableNotExistException e) {
+            return false;
+        }
     }
 
     @Override
